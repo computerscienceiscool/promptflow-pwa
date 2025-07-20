@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PromptFlow - Professional Teleprompter</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Professional teleprompter app for smooth, customizable text reading">
+    <meta name="theme-color" content="#3498db">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="PromptFlow">
+    
+    <!-- Web App Manifest -->
+    <link rel="manifest" href="./manifest.json">
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDE4MCAxODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9InVzZXJBcmVhUGFpbnQiPgogICAgICA8c3RvcCBzdG9wLWNvbG9yPSIjNzg2NjljIiAvPgogICAgICA8c3RvcCBzdG9wLWNvbG9yPSIjYzQ5NWRiIiBvZmZzZXQ9IjEiIC8+CiAgICA8L2xpbmVhckdyYWRpZW50PgogIDwvZGVmcz4KICA8cmVjdCB4Mj0iMTUiIHkyPSIxNSIgd2lkdGg9IjE1MCIgaGVpZ2h0PSIxNTAiIGZpbGw9InVybCgjdXNlckFyZWFQYWludCkiIHJ4PSI4IiByeD0iOCIvPgogIDxyZWN0IHgyPSIzNy41IiB5Mj0iTStjb2xvcjojMDg2OCIgd2lkdGg9IjEwNSIgaGVpZ2h0PSIxMDUiIGZpbGw9InVybCgjdXNlckFyZWFQYWludCkiIHJ4PSI0IiByeD0iNCIvPgogIDxyZWN0IHgyPSI1NCIgeTI9IjU0IiB3aWR0aD0iNzIiIGhlaWdodD0iNzIiIGZpbGw9InRyYW5zZm9ybTogdHJhbnNsYXRlKC0yOS41IDU0cHgpIiByeD0iNCIgcng9IjQiLz4KICA8dGV4dCB4PSI1MCUiIHk9IjUwJSIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRlciIgZmlsbD0iIzQ5NWRiIiBmb250LXNpemU9IjcwIiBvcGFjaXR5PSIuNCI+VDwvdGV4dD4KPC9zdmc+">
+    
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: var(--light-color);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column-reverse;
+            height: 100vh;
+        }
+        
+        header {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        .teleprompter-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .teleprompter-wrapper {
+            position: relative;
+            border: 2px solid var(--primary-color);
+            border-radius: 5px;
+            background-color: #000;
+            color: #fff;
+            flex: 1;
+            min-height: 250px;
+            resize: vertical;
+            overflow: hidden;
+        }
+        
+        .teleprompter-text {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            font-size: 28px;
+            line-height: 1.5;
+            padding: 20px;
+            transition: transform 0.1s linear;
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: var(--dark-color);
+        }
+        
+        button {
+            padding: 10px 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .btn-success {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+        
+        select, input[type="file"], textarea {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+            font-size: 16px;
+        }
+        
+        .preset-speeds {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .preset-btn {
+            padding: 5px 10px;
+            font-size: 14px;
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            border: 1px solid #ddd;
+        }
+        
+        .preset-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .theme-btn {
+            padding: 5px 15px;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f8f8f8;
+        }
+        
+        .theme-btn.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.3);
+        }
+        
+        .speed-value {
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .file-inputs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .file-input-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        #text-input {
+            width: 100%;
+            height: 100px;
+            resize: vertical;
+            margin-bottom: 10px;
+        }
+
+        /* PWA Install Banner */
+        .install-banner {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 1000;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .install-banner.show {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .install-banner button {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .install-banner button:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Responsive improvements for mobile */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .controls {
+                gap: 10px;
+            }
+            
+            .control-group {
+                min-width: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- PWA Install Banner -->
+        <div id="install-banner" class="install-banner">
+            <div>
+                <strong>Install PromptFlow</strong><br>
+                <small>Get quick access as a native app</small>
+            </div>
+            <div>
+                <button id="install-btn">Install</button>
+                <button id="dismiss-btn" style="margin-left: 10px; background: transparent;">✕</button>
+            </div>
+        </div>
+
+        <div class="teleprompter-container">
+            <div class="teleprompter-wrapper" id="teleprompter-container">
+                <div class="teleprompter-text" id="teleprompter-text">
+                    Welcome to PromptFlow. Please add your text below to begin.
+                </div>
+            </div>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <label for="text-input">Enter your text:</label>
+                    <textarea id="text-input" placeholder="Paste your script here..."></textarea>
+                    <button id="load-text-btn" class="btn-success">Load Text</button>
+                </div>
+                
+                <div class="control-group file-inputs">
+                    <div class="file-input-group">
+                        <label for="file-input">Upload a file:</label>
+                        <input type="file" id="file-input" accept=".txt,.docx,.pdf,.md,.markdown">
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <label for="speed-control">Reading speed: <span id="speed-value" class="speed-value">120</span> WPM</label>
+                    <input type="range" id="speed-control" min="80" max="400" step="10" value="180">
+                    
+                    <div class="preset-speeds">
+                        <button class="preset-btn" data-speed="100">Slow</button>
+                        <button class="preset-btn active" data-speed="180">Medium</button>
+                        <button class="preset-btn" data-speed="260">Fast</button>
+                        <button class="preset-btn" data-speed="360">Professional</button>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <label for="text-size">Text Size: <span id="text-size-value">28</span>px</label>
+                    <input type="range" id="text-size" min="16" max="48" step="2" value="28">
+                </div>
+                
+                <div class="control-group">
+                    <label>Theme:</label>
+                    <div style="display: flex; gap: 10px; margin-top: 5px;">
+                        <button id="theme-dark" class="theme-btn active" data-bg="#000" data-text="#fff">Dark</button>
+                        <button id="theme-light" class="theme-btn" data-bg="#fff" data-text="#00008B">Light</button>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <label>Playback controls:</label>
+                    <div style="display: flex; gap: 10px; margin-top: 5px;">
+                        <button id="start-btn" class="btn-success">Start</button>
+                        <button id="pause-btn" disabled>Pause</button>
+                        <button id="resume-btn" disabled>Resume</button>
+                        <button id="reset-btn" class="btn-danger">Reset</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <header>
+            <h1>PromptFlow</h1>
+            <p>Professional teleprompter for smooth, customizable reading</p>
+        </header>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+    
+    <!-- Set up PDF.js worker -->
+    <script>
+        if (typeof pdfjsLib !== 'undefined') {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+        }
+    </script>
+    
+    <script>
+        // PWA Installation Logic
+        let deferredPrompt;
+        const installBanner = document.getElementById('install-banner');
+        const installBtn = document.getElementById('install-btn');
+        const dismissBtn = document.getElementById('dismiss-btn');
+
+        // Listen for the beforeinstallprompt event
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('PWA install prompt triggered!');
+            // Prevent the mini-infobar from appearing on mobile
+            e.preventDefault();
+            // Stash the event so it can be triggered later
+            deferredPrompt = e;
+            // Show the install banner
+            installBanner.classList.add('show');
+        });
+
+        // Handle install button click
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                // Show the install prompt
+                deferredPrompt.prompt();
+                // Wait for the user to respond to the prompt
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`User response to the install prompt: ${outcome}`);
+                // Clear the deferredPrompt variable
+                deferredPrompt = null;
+                // Hide the install banner
+                installBanner.classList.remove('show');
+            }
+        });
+
+        // Handle dismiss button click
+        dismissBtn.addEventListener('click', () => {
+            installBanner.classList.remove('show');
+            // Store user preference to not show again for this session
+            sessionStorage.setItem('installDismissed', 'true');
+        });
+
+        // Check if user previously dismissed the banner
+        if (sessionStorage.getItem('installDismissed')) {
+            installBanner.style.display = 'none';
+        }
+
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then((registration) => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch((registrationError) => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+
+        // Wait for the DOM to be fully loaded before accessing elements
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const teleprompterText = document.getElementById('teleprompter-text');
+            const teleprompterContainer = document.getElementById('teleprompter-container');
+            const textInput = document.getElementById('text-input');
+            const loadTextBtn = document.getElementById('load-text-btn');
+            const fileInput = document.getElementById('file-input');
+            const speedControl = document.getElementById('speed-control');
+            const speedValue = document.getElementById('speed-value');
+            const startBtn = document.getElementById('start-btn');
+            const pauseBtn = document.getElementById('pause-btn');
+            const resumeBtn = document.getElementById('resume-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            const presetBtns = document.querySelectorAll('.preset-btn');
+            const textSizeControl = document.getElementById('text-size');
+            const textSizeValue = document.getElementById('text-size-value');
+            const themeDarkBtn = document.getElementById('theme-dark');
+            const themeLightBtn = document.getElementById('theme-light');
+            
+            // Variables
+            let scrollInterval;
+            let scrollSpeed = 180; // Initial speed (was previously 120)
+            let isScrolling = false;
+            let currentPosition = 0;
+            let textHeight = 0;
+            let containerHeight = 0;
+            let wordCount = 0;
+            let fontSize = 28; // Default font size in pixels
+            let theme = { bg: "#000", text: "#fff" }; // Default theme
+
+            // Helper function to create and add guideline element
+            function createGuideline() {
+                // Remove any existing guideline
+                const existingGuideline = document.getElementById('reading-guideline');
+                if (existingGuideline) {
+                    existingGuideline.remove();
+                }
+                
+                // Create new guideline
+                const guideline = document.createElement('div');
+                guideline.id = 'reading-guideline';
+                guideline.style.position = 'absolute';
+                guideline.style.left = '0';
+                guideline.style.top = '50%';
+                guideline.style.width = '100%';
+                guideline.style.height = '3px';
+                guideline.style.backgroundColor = theme.text === '#fff' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 139, 0.5)';
+                guideline.style.zIndex = '10';
+                
+                // Add to container
+                teleprompterContainer.appendChild(guideline);
+            }
+            
+            // Apply theme colors
+            function applyTheme(bgColor, textColor) {
+                theme.bg = bgColor;
+                theme.text = textColor;
+                
+                teleprompterContainer.style.backgroundColor = bgColor;
+                teleprompterText.style.color = textColor;
+                
+                // Update guideline
+                createGuideline();
+            }
+            
+            // Update speed value display
+            function updateSpeedValue() {
+                speedValue.textContent = scrollSpeed;
+            }
+            
+            // Update button states based on playback status
+            function updateButtonStates(isPaused = false) {
+                startBtn.disabled = isScrolling;
+                pauseBtn.disabled = !isScrolling;
+                resumeBtn.disabled = !isPaused;
+                resetBtn.disabled = false;
+            }
+            
+            // Reset the teleprompter to initial state
+            function resetTeleprompter() {
+                clearInterval(scrollInterval);
+                isScrolling = false;
+                currentPosition = 0;
+                teleprompterText.style.transform = 'translateY(0)';
+                updateButtonStates();
+            }
+            
+            // Update scroll speed during playback
+            function updateScrollSpeed() {
+                if (isScrolling) {
+                    clearInterval(scrollInterval);
+                    
+                    // Use the same simplified speed calculation with faster factor
+                    const basePixelsPerSecond = scrollSpeed / 10;
+                    const scrollStep = basePixelsPerSecond / 60;
+                    
+                    console.log(`Updated to ${scrollSpeed} WPM, new scroll step: ${scrollStep.toFixed(4)} pixels per frame`);
+                    
+                    scrollInterval = setInterval(() => {
+                        currentPosition += scrollStep;
+                        teleprompterText.style.transform = `translateY(-${currentPosition}px)`;
+                        
+                        // Stop when text has scrolled completely
+                        if (currentPosition >= textHeight - containerHeight) {
+                            clearInterval(scrollInterval);
+                            isScrolling = false;
+                            updateButtonStates();
+                        }
+                    }, 1000/60);
+                }
+            }
+            
+            // Load text into teleprompter
+            function loadText(text) {
+                // Format text with proper spacing for reading
+                const formattedText = text
+                    .replace(/\n\n+/g, '<div class="paragraph-break" style="height: 1.5em; margin: 0.5em 0;"></div>') // Add visual breaks for paragraphs
+                    .replace(/\n/g, '<br>'); // Replace single newlines with line breaks
+                    
+                teleprompterText.innerHTML = formattedText;
+                
+                resetTeleprompter();
+                
+                // Apply current font size
+                teleprompterText.style.fontSize = `${fontSize}px`;
+                
+                // Apply current theme
+                applyTheme(theme.bg, theme.text);
+                
+                // Update heights after formatting
+                setTimeout(() => {
+                    textHeight = teleprompterText.clientHeight;
+                    containerHeight = teleprompterContainer.clientHeight;
+                    console.log(`Text height after loading: ${textHeight}`);
+                }, 100);
+                
+                // Calculate word count for WPM calculations
+                wordCount = text.trim().split(/\s+/).length;
+                console.log(`Loaded text with ${wordCount} words`);
+            }
+            
+            // Read text file
+            function readTextFile(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.onerror = (e) => reject(e);
+                    reader.readAsText(file);
+                });
+            }
+            
+            // Read DOCX file
+            function readDocxFile(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const arrayBuffer = e.target.result;
+                        mammoth.extractRawText({ arrayBuffer })
+                            .then(result => resolve(result.value))
+                            .catch(reject);
+                    };
+                    reader.onerror = (e) => reject(e);
+                    reader.readAsArrayBuffer(file);
+                });
+            }
+            
+            // Read PDF file
+            function readPdfFile(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = async (e) => {
+                        const typedArray = new Uint8Array(e.target.result);
+                        try {
+                            const pdf = await pdfjsLib.getDocument(typedArray).promise;
+                            let text = '';
+                            
+                            for (let i = 1; i <= pdf.numPages; i++) {
+                                const page = await pdf.getPage(i);
+                                const content = await page.getTextContent();
+                                const strings = content.items.map(item => item.str);
+                                text += strings.join(' ') + '\n';
+                            }
+                            
+                            resolve(text);
+                        } catch (error) {
+                            reject(error);
+                        }
+                    };
+                    reader.onerror = (e) => reject(e);
+                    reader.readAsArrayBuffer(file);
+                });
+            }
+            
+            // Read Markdown file
+            function readMarkdownFile(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        try {
+                            const markdownText = e.target.result;
+                            // First get the raw text for the teleprompter
+                            const rawText = markdownText
+                                .replace(/#{1,6}\s+/g, '') // Remove headings
+                                .replace(/\*\*|\*|__|\\_/g, '') // Remove bold/italic markers
+                                .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Replace links with just the text
+                                .replace(/!\[[^\]]*\]\([^)]+\)/g, '') // Remove images
+                                .replace(/```[\s\S]*?```/g, '') // Remove code blocks
+                                .replace(/`([^`]+)`/g, '$1') // Remove inline code
+                                .replace(/^\s*[-*+]\s+/gm, '') // Remove list markers
+                                .replace(/^\s*\d+\.\s+/gm, ''); // Remove numbered list markers
+                            
+                            resolve(rawText);
+                        } catch (error) {
+                            reject(error);
+                        }
+                    };
+                    reader.onerror = (e) => reject(e);
+                    reader.readAsText(file);
+                });
+            }
+            
+            // Handle file uploads
+            async function handleFileUpload(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const extension = file.name.split('.').pop().toLowerCase();
+                
+                try {
+                    let text = '';
+                    
+                    if (extension === 'txt') {
+                        text = await readTextFile(file);
+                    } else if (extension === 'docx') {
+                        text = await readDocxFile(file);
+                    } else if (extension === 'pdf') {
+                        text = await readPdfFile(file);
+                    } else if (extension === 'md' || extension === 'markdown') {
+                        text = await readMarkdownFile(file);
+                    } else {
+                        alert('Unsupported file format. Please upload a .txt, .docx, .pdf, or .md file.');
+                        return;
+                    }
+                    
+                    textInput.value = text;
+                    loadText(text);
+                } catch (error) {
+                    console.error('Error reading file:', error);
+                    alert('Error reading file. Please try again with a different file.');
+                }
+            }
+            
+            // Start scrolling
+            function startScrolling() {
+                if (isScrolling) return;
+                
+                // Force recalculation of heights in case of resizing
+                textHeight = teleprompterText.clientHeight;
+                containerHeight = teleprompterContainer.clientHeight;
+                
+                // Check if there's text to scroll
+                if (teleprompterText.textContent.trim() === 'Welcome to PromptFlow. Please add your text below to begin.') {
+                    alert('Please add some text before starting the teleprompter.');
+                    return;
+                }
+                
+                resetTeleprompter();
+                isScrolling = true;
+                updateButtonStates();
+                
+                // Set minimum word count to prevent division by zero
+                const effectiveWordCount = Math.max(wordCount, 10);
+                
+                // Calculate scroll speed
+                // Increased speed factor from dividing by 20 to dividing by 10
+                // This makes all speeds 2x faster than before
+                const basePixelsPerSecond = scrollSpeed / 10;
+                const scrollStep = basePixelsPerSecond / 60; // Divide by 60 for frames per second
+                
+                console.log(`Starting teleprompter at ${scrollSpeed} WPM with base scroll rate: ${basePixelsPerSecond.toFixed(2)} pixels/sec`);
+                console.log(`Scroll step per frame: ${scrollStep.toFixed(4)} pixels`);
+                
+                // Simplified approach where speed directly determines scrolling rate
+                scrollInterval = setInterval(() => {
+                    currentPosition += scrollStep;
+                    teleprompterText.style.transform = `translateY(-${currentPosition}px)`;
+                    
+                    // Stop when text has scrolled completely
+                    if (currentPosition >= textHeight - containerHeight) {
+                        clearInterval(scrollInterval);
+                        isScrolling = false;
+                        updateButtonStates();
+                    }
+                }, 1000/60);
+            }
+            
+            // Pause scrolling
+            function pauseScrolling() {
+                if (!isScrolling) return;
+                
+                clearInterval(scrollInterval);
+                isScrolling = false;
+                updateButtonStates(true);
+            }
+            
+            // Resume scrolling
+            function resumeScrolling() {
+                if (isScrolling) return;
+                
+                isScrolling = true;
+                updateButtonStates();
+                
+                // Use the same simplified speed calculation with faster factor
+                const basePixelsPerSecond = scrollSpeed / 10;
+                const scrollStep = basePixelsPerSecond / 60;
+                
+                console.log(`Resuming at ${scrollSpeed} WPM with scroll step: ${scrollStep.toFixed(4)} pixels per frame`);
+                
+                scrollInterval = setInterval(() => {
+                    currentPosition += scrollStep;
+                    teleprompterText.style.transform = `translateY(-${currentPosition}px)`;
+                    
+                    // Stop when text has scrolled completely
+                    if (currentPosition >= textHeight - containerHeight) {
+                        clearInterval(scrollInterval);
+                        isScrolling = false;
+                        updateButtonStates();
+                    }
+                }, 1000/60);
+            }
+            
+            // Add event listeners
+            function setupEventListeners() {
+                // Load text button
+                loadTextBtn.addEventListener('click', () => {
+                    if (textInput.value.trim() !== '') {
+                        loadText(textInput.value);
+                    }
+                });
+
+                // File input
+                fileInput.addEventListener('change', handleFileUpload);
+
+                // Speed control
+                speedControl.addEventListener('input', () => {
+                    scrollSpeed = parseFloat(speedControl.value);
+                    updateSpeedValue();
+                    // Update preset button selection
+                   presetBtns.forEach(btn => {
+                       btn.classList.remove('active');
+                       if (parseFloat(btn.dataset.speed) === scrollSpeed) {
+                           btn.classList.add('active');
+                       }
+                   });
+                   
+                   updateScrollSpeed();
+               });
+
+               // Preset speed buttons
+               presetBtns.forEach(btn => {
+                   btn.addEventListener('click', () => {
+                       scrollSpeed = parseFloat(btn.dataset.speed);
+                       speedControl.value = scrollSpeed;
+                       updateSpeedValue();
+                       updateScrollSpeed();
+                       
+                       // Update active button
+                       presetBtns.forEach(b => b.classList.remove('active'));
+                       btn.classList.add('active');
+                   });
+               });
+               
+               // Text size control
+               textSizeControl.addEventListener('input', () => {
+                   fontSize = parseInt(textSizeControl.value);
+                   textSizeValue.textContent = fontSize;
+                   teleprompterText.style.fontSize = `${fontSize}px`;
+                   
+                   // Recalculate heights after font size change
+                   setTimeout(() => {
+                       textHeight = teleprompterText.clientHeight;
+                       containerHeight = teleprompterContainer.clientHeight;
+                       updateScrollSpeed();
+                   }, 100);
+               });
+               
+               // Theme controls
+               themeDarkBtn.addEventListener('click', () => {
+                   applyTheme(themeDarkBtn.dataset.bg, themeDarkBtn.dataset.text);
+                   themeDarkBtn.classList.add('active');
+                   themeLightBtn.classList.remove('active');
+               });
+               
+               themeLightBtn.addEventListener('click', () => {
+                   applyTheme(themeLightBtn.dataset.bg, themeLightBtn.dataset.text);
+                   themeLightBtn.classList.add('active');
+                   themeDarkBtn.classList.remove('active');
+               });
+
+               // Control buttons
+               startBtn.addEventListener('click', startScrolling);
+               pauseBtn.addEventListener('click', pauseScrolling);
+               resumeBtn.addEventListener('click', resumeScrolling);
+               resetBtn.addEventListener('click', resetTeleprompter);
+
+               // Handle teleprompter resizing
+               window.addEventListener('resize', () => {
+                   containerHeight = teleprompterContainer.clientHeight;
+                   textHeight = teleprompterText.clientHeight;
+               });
+           }
+           
+           // Initialize
+           function init() {
+               console.log("Initializing PromptFlow...");
+               
+               // Ensure the container has a minimum height
+               teleprompterContainer.style.minHeight = "250px";
+               
+               // Set initial font size
+               teleprompterText.style.fontSize = `${fontSize}px`;
+               
+               // Initialize theme
+               applyTheme(theme.bg, theme.text);
+               
+               // Initialize speed value display
+               updateSpeedValue();
+               
+               // Initialize heights
+               setTimeout(() => {
+                   containerHeight = teleprompterContainer.clientHeight;
+                   textHeight = teleprompterText.clientHeight;
+                   console.log("Initialized heights - Container:", containerHeight, "Text:", textHeight);
+               }, 500);
+               
+               // Set up event listeners
+               setupEventListeners();
+               
+               // Test banner manually for debugging
+               setTimeout(() => {
+                   console.log('Testing install banner availability...');
+                   const banner = document.getElementById('install-banner');
+                   if (banner) {
+                       console.log('Install banner element found!');
+                       // Force show banner for testing (remove this in production)
+                       // banner.classList.add('show');
+                   } else {
+                       console.log('Install banner element NOT found!');
+                   }
+               }, 1000);
+           }
+           
+           // Start initialization
+           init();
+       });
+   </script>
+</body>
+</html>
