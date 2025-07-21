@@ -62,13 +62,15 @@
             max-width: 1200px;
             margin: 0 auto;
             display: flex;
-            flex-direction: column-reverse;
+            flex-direction: column;
             height: 100vh;
         }
-        
+
+
         header {
             text-align: center;
             margin-top: 20px;
+            order: -1; /* Move header to the top */
         }
         
         h1 {
@@ -92,7 +94,7 @@
             min-height: 250px;
             resize: vertical;
             overflow: hidden;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.15);  /* ← ADDED */
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);  
         }   
 
         .teleprompter-text {
@@ -115,12 +117,14 @@
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        
+                
         .control-group {
             display: flex;
             flex-direction: column;
             flex: 1;
             min-width: 200px;
+            align-self: flex-start; 
+            position: relative;
         }
         
         label {
@@ -363,6 +367,18 @@
             transition: all 0.2s ease;
         }
         
+        #help-content {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            z-index: 1000;
+            max-width: 500px;
+        }
+
+        #help-toggle {
+            width: auto;
+            align-self: flex-start;
+        }
 </style> 
 </head>
 <body>
@@ -425,48 +441,43 @@
                         <button id="mirror-toggle" class="theme-btn" title="Mirror mode for teleprompter hardware">Mirror</button>
                     </div>
                 </div>
-                
                 <div class="control-group">
-                    <label>Playback controls:</label>
-                    <div style="display: flex; gap: 10px; margin-top: 5px;">
-                        <button id="start-btn" class="btn-success">Start</button>
-                        <button id="pause-btn" disabled>Pause</button>
-                        <button id="resume-btn" disabled>Resume</button>
-                        <button id="reset-btn" class="btn-danger">Reset</button>
-                    </div>
+                  <label>Playback controls:</label>
+                  <div style="display: flex; gap: 10px; margin-top: 5px; align-items: center; flex-wrap: wrap;">
+                    <button id="start-btn" class="btn-success">Start</button>
+                    <button id="pause-btn" disabled>Pause</button>
+                    <button id="resume-btn" disabled>Resume</button>
+                    <button id="reset-btn" class="btn-danger">Reset</button>
+                    <button id="help-toggle" class="btn-help" style="margin-left: auto;">Help & Features</button>
+                  </div>
+
+                  <div id="help-content" class="help-content hidden">
+                    <h3>PromptFlow Features</h3>
+
+                    <h4>File Support</h4>
+                    <p>Upload TXT, DOCX, PDF, or Markdown files directly</p>
+
+                    <h4>Keyboard Shortcuts</h4>
+                    <ul>
+                      <strong>Spacebar</strong> = Play / Pause<br>
+                      <strong>← / →</strong> = Adjust Speed<br>
+                      <strong>↑ / ↓</strong> = Adjust Text Size<br>
+                      <strong>M</strong> = Toggle Mirror Mode<br>   
+                    </ul>
+
+                    <h4>Mirror Mode</h4>
+                    <p>Flips text horizontally for use with teleprompter hardware (beam-splitter glass)</p>
+
+                    <h4>Best Practices</h4>
+                    <p>• Position device near camera for natural eye contact<br>
+                      • Use larger text sizes for easier reading<br>
+                      • Practice with slower speeds first</p>
+
+                    <h4>Installation</h4>
+                    <p>Install as a native app for better performance and offline use</p>
+                  </div>
                 </div>
-                <!-- Add this as a new control group -->
-                <div class="control-group">
-                    <button id="help-toggle" class="btn-help">Help & Features</button>
-                    <div id="help-content" class="help-content hidden">
-                        <h3>PromptFlow Features</h3>
-                        
-                        <h4>File Support</h4>
-                        <p>Upload TXT, DOCX, PDF, or Markdown files directly</p>
-                        
-                        <h4> Keyboard Shortcuts</h4>
-                        <p><strong>Spacebar:</strong> Play/Pause | <strong>←→:</strong> Speed | <strong>↑↓:</strong> Text Size | <strong>M:</strong> Mirror Mode</p>
-                        
-                        <h4>Mirror Mode</h4>
-                        <p>Flips text horizontally for use with teleprompter hardware (beam-splitter glass)</p>
-                        
-                        <h4>Best Practices</h4>
-                        <p>• Position device near camera for natural eye contact<br>
-                        • Use larger text sizes for easier reading<br>
-                        • Practice with slower speeds first</p>
-                        
-                        <h4>📱 Installation</h4>
-                        <p>Install as a native app for better performance and offline use</p>
-                    </div>
-                </div>
-                <div class="shortcuts-info">
-                    <strong>Keyboard Shortcuts:</strong>
-                    <strong>Spacebar</strong> = Play/Pause | 
-                    <strong>←→</strong> = Speed | 
-                    <strong>↑↓</strong> = Text Size
-                </div>
-             </div>
-        </div>
+            </div>
         <header>
             <h1>PromptFlow</h1>
             <p>Professional teleprompter for smooth, customizable reading</p>
@@ -1023,8 +1034,17 @@
                 
                 // Mirror toggle button
                 mirrorToggle.addEventListener('click', toggleMirrorMode);
-
                 
+                const helpToggle = document.getElementById('help-toggle');
+                const helpContent = document.getElementById('help-content');
+
+                helpToggle.addEventListener('click', () => {
+                  helpContent.classList.toggle('hidden');
+                  helpToggle.textContent = helpContent.classList.contains('hidden')
+                    ? '? Help & Features'
+                    : '? Hide Help';
+                });
+                    
                 // File input
                 fileInput.addEventListener('change', handleFileUpload);
 
