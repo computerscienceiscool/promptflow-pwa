@@ -1,3 +1,9 @@
+//    PromptFlow v1.0.0 - Professional Teleprompter
+//    Copyright (c) 2025 Meadow Muse Studios. All rights reserved.
+//    This software is provided "as-is" without any warranty.    
+//    Licensed under [License Type] - see LICENSE file for details.
+//    Website: https://promptflow.app
+//    Contact: support@promptflow.app
 const CACHE_NAME = 'promptflow-v1.0.0';
 const urlsToCache = [
   './',
@@ -66,15 +72,12 @@ self.addEventListener('fetch', (event) => {
           if (!response || response.status !== 200 || response.type !== 'basic') {
             return response;
           }
-
           // Clone the response for caching
           const responseToCache = response.clone();
-
           caches.open(CACHE_NAME)
             .then((cache) => {
               cache.put(event.request, responseToCache);
             });
-
           return response;
         });
       }).catch(() => {

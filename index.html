@@ -1,3 +1,4 @@
+<!-- Copyright (c) 2025 PromptFlow. All rights reserved. -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -41,7 +42,22 @@
             background-color: var(--light-color);
             padding: 20px;
         }
-        
+
+        button {
+            min-height: 44px;
+            font-weight: 500;
+            border-radius: 8px;
+        }
+
+
+        .controls {
+            border-radius: 8px;
+        }
+
+        .file-input-group:hover {
+            background-color: #f8f9ff;
+            border-color: var(--primary-color);
+        }
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -69,15 +85,16 @@
         .teleprompter-wrapper {
             position: relative;
             border: 2px solid var(--primary-color);
-            border-radius: 5px;
+            border-radius: 12px;  /* ← CHANGED from 5px */
             background-color: #000;
             color: #fff;
             flex: 1;
             min-height: 250px;
             resize: vertical;
             overflow: hidden;
-        }
-        
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);  /* ← ADDED */
+        }   
+
         .teleprompter-text {
             position: absolute;
             width: 100%;
@@ -174,18 +191,25 @@
             background-color: var(--primary-color);
             color: white;
         }
-        
         .theme-btn {
-            padding: 5px 15px;
-            cursor: pointer;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background-color: #f8f8f8;
+            background-color: #e9ecef;
+            border: 2px solid #adb5bd;
+            color: #212529;
+            font-weight: 500;
+            transition: all 0.2s ease;
         }
-        
+
+        .theme-btn:hover {
+            background-color: #dee2e6;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
         .theme-btn.active {
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.3);
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
         }
         
         .speed-value {
@@ -247,6 +271,8 @@
             background: rgba(255,255,255,0.3);
         }
 
+
+
         @keyframes slideUp {
             from { transform: translateY(100%); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
@@ -266,7 +292,78 @@
                 min-width: 150px;
             }
         }
-    </style>
+
+        .teleprompter-text.mirrored {
+            transform: scaleX(-1);
+        }
+
+
+        .btn-help {
+            background-color: #6c757d;
+            font-size: 14px;
+            padding: 8px 12px;
+        }
+
+        .btn-help:hover {
+            background-color: #5a6268;
+        }
+
+        .help-content {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 16px;
+            margin-top: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .help-content.hidden {
+            display: none;
+        }
+
+        .help-content h3 {
+            color: var(--primary-color);
+            margin-bottom: 16px;
+            font-size: 18px;
+        }
+
+        .help-content h4 {
+            color: var(--dark-color);
+            margin: 12px 0 6px 0;
+            font-size: 15px;
+        }
+
+        .help-content p {
+            margin-bottom: 8px;
+        }
+
+        .shortcuts-info {
+            background: rgba(52, 152, 219, 0.1);
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 14px;
+            color: var(--dark-color);
+        }
+
+        .shortcuts-info strong {
+            color: var(--primary-color);
+        }
+        .shortcuts-info strong {
+            color: var(--primary-color);
+        }
+        
+        h1 {
+            font-weight: 600;
+        }
+        
+        button, .file-input-group {
+            transition: all 0.2s ease;
+        }
+        
+</style> 
 </head>
 <body>
     <div class="container">
@@ -325,6 +422,7 @@
                     <div style="display: flex; gap: 10px; margin-top: 5px;">
                         <button id="theme-dark" class="theme-btn active" data-bg="#000" data-text="#fff">Dark</button>
                         <button id="theme-light" class="theme-btn" data-bg="#fff" data-text="#00008B">Light</button>
+                        <button id="mirror-toggle" class="theme-btn" title="Mirror mode for teleprompter hardware">Mirror</button>
                     </div>
                 </div>
                 
@@ -337,9 +435,38 @@
                         <button id="reset-btn" class="btn-danger">Reset</button>
                     </div>
                 </div>
-            </div>
+                <!-- Add this as a new control group -->
+                <div class="control-group">
+                    <button id="help-toggle" class="btn-help">Help & Features</button>
+                    <div id="help-content" class="help-content hidden">
+                        <h3>PromptFlow Features</h3>
+                        
+                        <h4>File Support</h4>
+                        <p>Upload TXT, DOCX, PDF, or Markdown files directly</p>
+                        
+                        <h4> Keyboard Shortcuts</h4>
+                        <p><strong>Spacebar:</strong> Play/Pause | <strong>←→:</strong> Speed | <strong>↑↓:</strong> Text Size | <strong>M:</strong> Mirror Mode</p>
+                        
+                        <h4>Mirror Mode</h4>
+                        <p>Flips text horizontally for use with teleprompter hardware (beam-splitter glass)</p>
+                        
+                        <h4>Best Practices</h4>
+                        <p>• Position device near camera for natural eye contact<br>
+                        • Use larger text sizes for easier reading<br>
+                        • Practice with slower speeds first</p>
+                        
+                        <h4>📱 Installation</h4>
+                        <p>Install as a native app for better performance and offline use</p>
+                    </div>
+                </div>
+                <div class="shortcuts-info">
+                    <strong>Keyboard Shortcuts:</strong>
+                    <strong>Spacebar</strong> = Play/Pause | 
+                    <strong>←→</strong> = Speed | 
+                    <strong>↑↓</strong> = Text Size
+                </div>
+             </div>
         </div>
-        
         <header>
             <h1>PromptFlow</h1>
             <p>Professional teleprompter for smooth, customizable reading</p>
@@ -434,6 +561,7 @@
             const textSizeValue = document.getElementById('text-size-value');
             const themeDarkBtn = document.getElementById('theme-dark');
             const themeLightBtn = document.getElementById('theme-light');
+            const mirrorToggle = document.getElementById('mirror-toggle');
             
             // Variables
             let scrollInterval;
@@ -445,6 +573,7 @@
             let wordCount = 0;
             let fontSize = 28; // Default font size in pixels
             let theme = { bg: "#000", text: "#fff" }; // Default theme
+            let isMirrored = false; // Mirror mode state
 
             // Helper function to create and add guideline element
             function createGuideline() {
@@ -499,7 +628,9 @@
                 clearInterval(scrollInterval);
                 isScrolling = false;
                 currentPosition = 0;
-                teleprompterText.style.transform = 'translateY(0)';
+                const translateY = 'translateY(0)';
+                const scaleX = isMirrored ? ' scaleX(-1)' : '';
+                teleprompterText.style.transform = translateY + scaleX;
                 updateButtonStates();
             }
             
@@ -516,7 +647,9 @@
                     
                     scrollInterval = setInterval(() => {
                         currentPosition += scrollStep;
-                        teleprompterText.style.transform = `translateY(-${currentPosition}px)`;
+                        const translateY = `translateY(-${currentPosition}px)`;
+                        const scaleX = isMirrored ? ' scaleX(-1)' : '';
+                        teleprompterText.style.transform = translateY + scaleX;
                         
                         // Stop when text has scrolled completely
                         if (currentPosition >= textHeight - containerHeight) {
@@ -609,25 +742,39 @@
                 });
             }
             
+
+
+
+
             // Read Markdown file
             function readMarkdownFile(file) {
                 return new Promise((resolve, reject) => {
                     const reader = new FileReader();
                     reader.onload = (e) => {
                         try {
-                            const markdownText = e.target.result;
-                            // First get the raw text for the teleprompter
-                            const rawText = markdownText
-                                .replace(/#{1,6}\s+/g, '') // Remove headings
-                                .replace(/\*\*|\*|__|\\_/g, '') // Remove bold/italic markers
-                                .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Replace links with just the text
-                                .replace(/!\[[^\]]*\]\([^)]+\)/g, '') // Remove images
-                                .replace(/```[\s\S]*?```/g, '') // Remove code blocks
-                                .replace(/`([^`]+)`/g, '$1') // Remove inline code
-                                .replace(/^\s*[-*+]\s+/gm, '') // Remove list markers
-                                .replace(/^\s*\d+\.\s+/gm, ''); // Remove numbered list markers
+                            let markdownText = e.target.result;
                             
-                            resolve(rawText);
+                            // Simple text cleanup without problematic regex patterns
+                            // Remove markdown headers
+                            markdownText = markdownText.replace(/^#+\s*/gm, '');
+                            
+                            // Remove bold/italic markers  
+                            markdownText = markdownText.replace(/\*\*/g, '');
+                            markdownText = markdownText.replace(/\*/g, '');
+                            markdownText = markdownText.replace(/__/g, '');
+                            markdownText = markdownText.replace(/_/g, '');
+                            
+                            // Remove links - keep just the text part
+                            markdownText = markdownText.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+                            
+                            // Remove images
+                            markdownText = markdownText.replace(/!\[[^\]]*\]\([^)]+\)/g, '');
+                            
+                            // Remove list markers
+                            markdownText = markdownText.replace(/^\s*[-*+]\s+/gm, '');
+                            markdownText = markdownText.replace(/^\s*\d+\.\s+/gm, '');
+                            
+                            resolve(markdownText);
                         } catch (error) {
                             reject(error);
                         }
@@ -701,8 +848,12 @@
                 // Simplified approach where speed directly determines scrolling rate
                 scrollInterval = setInterval(() => {
                     currentPosition += scrollStep;
-                    teleprompterText.style.transform = `translateY(-${currentPosition}px)`;
-                    
+                    const translateY = `translateY(-${currentPosition}px)`;
+                    const scaleX = isMirrored ? ' scaleX(-1)' : '';
+                    teleprompterText.style.transform = translateY + scaleX;
+
+
+
                     // Stop when text has scrolled completely
                     if (currentPosition >= textHeight - containerHeight) {
                         clearInterval(scrollInterval);
@@ -736,8 +887,9 @@
                 
                 scrollInterval = setInterval(() => {
                     currentPosition += scrollStep;
-                    teleprompterText.style.transform = `translateY(-${currentPosition}px)`;
-                    
+                    const translateY = `translateY(-${currentPosition}px)`;
+                    const scaleX = isMirrored ? ' scaleX(-1)' : '';
+                    teleprompterText.style.transform = translateY + scaleX;
                     // Stop when text has scrolled completely
                     if (currentPosition >= textHeight - containerHeight) {
                         clearInterval(scrollInterval);
@@ -747,6 +899,119 @@
                 }, 1000/60);
             }
             
+            // Keyboard Shortcuts Handler
+        function setupKeyboardShortcuts() {
+            document.addEventListener('keydown', (event) => {
+                // Prevent shortcuts when typing in input fields
+                if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
+                    return;
+                }
+
+                switch(event.code) {
+                    case 'Space':
+                        event.preventDefault();
+                        // Toggle play/pause
+                        if (!isScrolling && !pauseBtn.disabled) {
+                            resumeScrolling();
+                        } else if (isScrolling) {
+                            pauseScrolling();
+                        } else {
+                            startScrolling();
+                        }
+                        break;
+                        
+                    case 'ArrowLeft':
+                        event.preventDefault();
+                        scrollSpeed = Math.max(80, scrollSpeed - 10);
+                        speedControl.value = scrollSpeed;
+                        updateSpeedValue();
+                        updateScrollSpeed();
+                        updatePresetButtons();
+                        break;
+                        
+                    case 'ArrowRight':
+                        event.preventDefault();
+                        scrollSpeed = Math.min(400, scrollSpeed + 10);
+                        speedControl.value = scrollSpeed;
+                        updateSpeedValue();
+                        updateScrollSpeed();
+                        updatePresetButtons();
+                        break;
+                        
+                    case 'ArrowUp':
+                        event.preventDefault();
+                        fontSize = Math.min(48, fontSize + 2);
+                        textSizeControl.value = fontSize;
+                        textSizeValue.textContent = fontSize;
+                        teleprompterText.style.fontSize = `${fontSize}px`;
+                        recalculateHeights();
+                        break;
+                        
+                    case 'ArrowDown':
+                        event.preventDefault();
+                        fontSize = Math.max(16, fontSize - 2);
+                        textSizeControl.value = fontSize;
+                        textSizeValue.textContent = fontSize;
+                        teleprompterText.style.fontSize = `${fontSize}px`;
+                        recalculateHeights();
+                        break;
+                        
+                    case 'KeyM':
+                        event.preventDefault();
+                        toggleMirrorMode();
+                        break;
+                }
+            });
+        }
+
+        // Helper function to update preset button selection
+        function updatePresetButtons() {
+            presetBtns.forEach(btn => {
+                btn.classList.remove('active');
+                if (parseFloat(btn.dataset.speed) === scrollSpeed) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        // Helper function to recalculate heights after font size change
+        function recalculateHeights() {
+            setTimeout(() => {
+                textHeight = teleprompterText.clientHeight;
+                containerHeight = teleprompterContainer.clientHeight;
+                updateScrollSpeed();
+            }, 100);
+        }
+
+        // Mirror Mode Toggle Function
+        function toggleMirrorMode() {
+            isMirrored = !isMirrored;
+            
+            if (isMirrored) {
+                teleprompterText.classList.add('mirrored');
+                mirrorToggle.classList.add('active');
+                mirrorToggle.textContent = 'Mirror ON';
+            } else {
+                teleprompterText.classList.remove('mirrored');
+                mirrorToggle.classList.remove('active');
+                mirrorToggle.textContent = 'Mirror';
+            }
+            
+            // IMMEDIATELY UPDATE THE TRANSFORM!
+            const currentTransform = teleprompterText.style.transform;
+            if (currentTransform.includes('translateY')) {
+                // Extract the translateY value and combine with mirror
+                const translateY = currentTransform.match(/translateY\([^)]+\)/)[0];
+                const scaleX = isMirrored ? ' scaleX(-1)' : '';
+                teleprompterText.style.transform = translateY + scaleX;
+            } else {
+                // No existing transform, just set the mirror
+                const scaleX = isMirrored ? 'scaleX(-1)' : '';
+                teleprompterText.style.transform = scaleX;
+            }
+        }
+
+
             // Add event listeners
             function setupEventListeners() {
                 // Load text button
@@ -755,7 +1020,11 @@
                         loadText(textInput.value);
                     }
                 });
+                
+                // Mirror toggle button
+                mirrorToggle.addEventListener('click', toggleMirrorMode);
 
+                
                 // File input
                 fileInput.addEventListener('change', handleFileUpload);
 
@@ -853,6 +1122,8 @@
                
                // Set up event listeners
                setupEventListeners();
+
+               setupKeyboardShortcuts();
                
                // Test banner manually for debugging
                setTimeout(() => {
