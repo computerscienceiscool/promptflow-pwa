@@ -9,7 +9,7 @@
     <!-- PWA Meta Tags -->
     <meta name="description" content="Professional teleprompter app for smooth, customizable text reading">
     <meta name="theme-color" content="#3498db">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="PromptFlow">
     
@@ -169,12 +169,17 @@
             background-color: #27ae60;
         }
         
-        select, input[type="file"], textarea {
+  /*      select, input[type="file"], textarea {
             padding: 8px;
             border: 1px solid #ddd;
             border-radius: 4px;
             width: 100%;
             font-size: 16px;
+        }*/
+        
+        input[type="range"] {
+            width: 60%;
+            max-width: 200px;
         }
         
         .preset-speeds {
@@ -358,7 +363,7 @@
         .shortcuts-info strong {
             color: var(--primary-color);
         }
-        
+       
         h1 {
             font-weight: 600;
         }
@@ -379,6 +384,18 @@
             width: auto;
             align-self: flex-start;
         }
+
+        #header-container.bottom {
+            order: 2;
+            margin-top: auto;
+            margin-bottom: 20px;
+        }
+
+        #header-container.top {
+            order: -1;
+            margin-top: 20px;
+        }
+
 </style> 
 </head>
 <body>
@@ -433,12 +450,13 @@
                     <input type="range" id="text-size" min="16" max="48" step="2" value="28">
                 </div>
                 
-                <div class="control-group">
+                <div class="control-group" style="align-items: center; text-align: center;">
                     <label>Theme:</label>
-                    <div style="display: flex; gap: 10px; margin-top: 5px;">
+                    <div style="display: flex; gap: 10px; margin-top: 5px; justify-content: center; flex-wrap: wrap;">
                         <button id="theme-dark" class="theme-btn active" data-bg="#000" data-text="#fff">Dark</button>
                         <button id="theme-light" class="theme-btn" data-bg="#fff" data-text="#00008B">Light</button>
                         <button id="mirror-toggle" class="theme-btn" title="Mirror mode for teleprompter hardware">Mirror</button>
+                        <button id="toggle-header-btn" class="theme-btn">Move Header to Bottom</button>
                     </div>
                 </div>
                 <div class="control-group">
@@ -468,6 +486,9 @@
                     <h4>Mirror Mode</h4>
                     <p>Flips text horizontally for use with teleprompter hardware (beam-splitter glass)</p>
 
+                    <h4>Move Header to Bottom</h4>
+                    <p>Switches header position to bottom for better visibility during recording. This button toggles the header location.</p>
+
                     <h4>Best Practices</h4>
                     <p>• Position device near camera for natural eye contact<br>
                       • Use larger text sizes for easier reading<br>
@@ -478,10 +499,12 @@
                   </div>
                 </div>
             </div>
-        <header>
+        <div id="header-container" class="top">
+            <header id="app-header">
             <h1>PromptFlow</h1>
             <p>Professional teleprompter for smooth, customizable reading</p>
-        </header>
+            </header>
+        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
@@ -1115,6 +1138,21 @@
                    containerHeight = teleprompterContainer.clientHeight;
                    textHeight = teleprompterText.clientHeight;
                });
+
+                // Toggle header position
+                const toggleHeaderBtn = document.getElementById('toggle-header-btn');
+                const headerContainer = document.getElementById('header-container');
+                let isHeaderAtBottom = false;
+
+                toggleHeaderBtn.addEventListener('click', () => {
+                    isHeaderAtBottom = !isHeaderAtBottom;
+                    headerContainer.className = isHeaderAtBottom ? 'bottom' : 'top';
+                    toggleHeaderBtn.textContent = isHeaderAtBottom
+                        ? 'Move Header to Top'
+                        : 'Move Header to Bottom';
+                });
+
+
            }
            
            // Initialize
@@ -1157,6 +1195,10 @@
                        console.log('Install banner element NOT found!');
                    }
                }, 1000);
+
+                const headerContainer = document.getElementById('header-container');
+                headerContainer.classList.add('top');
+
            }
            
            // Start initialization
